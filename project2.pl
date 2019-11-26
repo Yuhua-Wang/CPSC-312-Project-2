@@ -49,7 +49,7 @@ findpath(F,T,C,P) :- path(F,T,[F],C,P).
 
 
 
-% TODO: code below have not be tested
+% TODO: code below has not been tested
 % list [O1|L0]
 % sorturgent(L1,L2): true if L2 conclude all element in L1 in correct sequence(emerge->not emerge).
 
