@@ -1,4 +1,4 @@
-
+:- dynamic a/0,b/0,c1/0,c2/0,c3/0.
 
 % connected(X,Y,C)
 % is true if the robot can move from location X to location Y with a cost of C
@@ -14,6 +14,14 @@ connected(c3, b, 3).
 connected(c1, c2, 4).
 connected(c2, c1, 2).
 
+/*
+% tests written for shortestPath
+connected(j,k,5).
+connected(k,l,5).
+connected(i,o,10).
+connected(o,l,10).
+connected(j,i,1).
+*/
 
 % order(C,Q,R,U)
 % is true if a customer at location C has ordered Q units of food from restaurants at R, and the urgency level is U.
@@ -26,7 +34,7 @@ order(c1, 1, b, not_urgent).
 
 
 % path(From,To,Visited,Cost,Path)
-% is true if Path is a list of locations representing a valid path from From to To with cost Cost. Visited is a list of visited nodes
+% is true if Path is a list of locations representing a valid path from From to To with the cost being Cost. Visited is a list of visited nodes.
 % it is recommend to use findpath(F,T,C,P) as the visited list can be misleading
 
 path(X,X,_,0,[X]).
@@ -42,6 +50,21 @@ path(F,T,V,C,[F|P1]) :-
 % this is basically the same as path(F,T,V,C,P) but does not show the useless and potentially misleading visited list
 
 findpath(F,T,C,P) :- path(F,T,[F],C,P).
+
+
+% shortestPath(From,To,Cost,Path)
+% is true if Path is a list of location representing the shortest (cheapest) path from From to To with the cost being Cost
+
+
+shortestPath(F,T,C,P) :- findpath(F,T,C,P), \+notShortest(F,T,C,P).
+
+
+
+% notShortest(From,To,Cost,Path)
+% is true if there is other path from From to To with lower cost than Cost
+
+notShortest(F,T,C,P) :- findpath(F,T,C1,P1), dif(P,P1), C1<C.
+
 
 
 
