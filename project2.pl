@@ -80,3 +80,41 @@ norepeat([], []).
 norepeat([H|T1],L2) :- member(H,T1), norepeat(T1,L2).
 norepeat([H|T1],[H|T2]):- \+member(H,T1), norepeat(T1,T2).
 
+reachable([],[]).
+reachable([order(P1,X,P2,urgent)|T1],[order(P1,X,P2,urgent)|T2]):-
+findpath(P1,P2,C,P),
+reachable(T1,T2).
+reachable([order(P1,X,P2,not_urgent)|T1],[order(P1,X,P2,not_urgent)|T2]):-
+findpath(P1,P2,C,P),
+reachable(T1,T2).
+
+
+check([],[]).
+check(L1,L4):-
+norepeat(L1,L2),
+reachable(L2,L3),
+sorturgent(L3,L4).
+
+
+% plan(L2,C,P1).
+% true if P1 gives the path that the robot can finish all the order.
+plan([],0,[]).
+plan([order(P1,_,P2,_)|L2],C,P30):-
+findpath(P1,P2,C1,P10),
+plan(L2,C2,P20),
+C is C1+C2,
+append(P10,P20,P30).
+
+
+do([],[]).
+do(L1,C,P1):-
+check(L1,L2),
+plan(L2,C,P1).
+
+%try
+%do([order(a,4,c1,urgent)],C,P1).
+%do([order(a,4,c1,urgent),order(a,2,c2,urgent)],C,P1).
+%do([order(a,4,c1,not_urgent),order(a,2,c3,not_urgent),order(a,4,b,urgent),order(a,4,b,urgent)],C,P1).
+%do([order(a,4,c5,urgent)],C,P1).
+%do([order(a,4,b,urgent),order(a,4,c,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent)],P1).
+
