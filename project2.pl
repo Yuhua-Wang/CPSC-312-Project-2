@@ -80,6 +80,8 @@ norepeat([], []).
 norepeat([H|T1],L2) :- member(H,T1), norepeat(T1,L2).
 norepeat([H|T1],[H|T2]):- \+member(H,T1), norepeat(T1,T2).
 
+%reachable(L1,L2).
+% true if L2 contains all elements in L1 whose receiver place is reachable from the restefrant.
 reachable([],[]).
 reachable([order(P1,X,P2,urgent)|T1],[order(P1,X,P2,urgent)|T2]):-
 findpath(P1,P2,C,P),
@@ -88,7 +90,8 @@ reachable([order(P1,X,P2,not_urgent)|T1],[order(P1,X,P2,not_urgent)|T2]):-
 findpath(P1,P2,C,P),
 reachable(T1,T2).
 
-
+%check(L1,L2).
+% true if L2 contains all legal order in L1.
 check([],[]).
 check(L1,L4):-
 norepeat(L1,L2),
@@ -105,7 +108,8 @@ plan(L2,C2,P20),
 C is C1+C2,
 append(P10,P20,P30).
 
-
+%do(L1,L2).
+% start function that consuming a list of order and produce a list of path.
 do([],[]).
 do(L1,C,P1):-
 check(L1,L2),
