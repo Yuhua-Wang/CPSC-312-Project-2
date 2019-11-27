@@ -36,7 +36,6 @@ order(c1, 1, b, not_urgent).
 % path(From,To,Visited,Cost,Path)
 % is true if Path is a list of locations representing a valid path from From to To with the cost being Cost. Visited is a list of visited nodes.
 % it is recommend to use findpath(F,T,C,P) as the visited list can be misleading
-
 path(X,X,_,0,[X]).
 path(F,T,_ , C, [F,T]) :- dif(F,T), connected(F,T,C).
 path(F,T,V,C,[F|P1]) :-
@@ -48,45 +47,36 @@ path(F,T,V,C,[F|P1]) :-
 % findpath(From,To,Cost,Path)
 % is true if Path is a list of locations representing a valid path from From to To with cost Cost.
 % this is basically the same as path(F,T,V,C,P) but does not show the useless and potentially misleading visited list
-
 findpath(F,T,C,P) :- path(F,T,[F],C,P).
 
 
 % shortestPath(From,To,Cost,Path)
 % is true if Path is a list of location representing the shortest (cheapest) path from From to To with the cost being Cost
-
-
 shortestPath(F,T,C,P) :- findpath(F,T,C,P), \+notShortest(F,T,C,P).
-
-
 
 % notShortest(From,To,Cost,Path)
 % is true if there is other path from From to To with lower cost than Cost
-
 notShortest(F,T,C,P) :- findpath(F,T,C1,P1), dif(P,P1), C1<C.
 
 
+% sorturgent(L1,L2):
+% true if L1 is a list of order and L2 conclude all element in L1 in correct sequence(emerge->not emerge).
+sorturgent([],[]).
+sorturgent([order(P1,X,P2,urgent)|T1],[order(P1,X,P2,urgent)|T2]):- sorturgent(T1,T2).
+sorturgent([order(P1,X,P2,not_urgent)|T1],R2):-
+                     append(T2,[order(P1,X,P2,not_urgent)],R2), sorturgent(T1,T2).
 
 
+% append(L1,L2,L3).
+% is true if L3 is the list made by appending L1 and L2
+append(L1,[],L1).
+append([],L2,L2).
+append([H1|T],L2,[H1|R]):- append(T,L2,R).
 
 
+% norepeat(L1, L2).
+% true if L2 is the same as L1 without duplicates
+norepeat([], []).
+norepeat([H|T1],L2) :- member(H,T1), norepeat(T1,L2).
+norepeat([H|T1],[H|T2]):- \+member(H,T1), norepeat(T1,T2).
 
-
-% TODO: code below has not been tested
-% list [O1|L0]
-% sorturgent(L1,L2): true if L2 conclude all element in L1 in correct sequence(emerge->not emerge).
-
-sorturgent(empty,empty).
-
-sorturgent([order(P1,X,P2,urgent)|T1],[order(P1,X,P2,urgent)|T2]):-
-sorturgent(T1,T2).
-
-sorturgent([order(P1,X,P2,not_urgent)|T1],[T2|order(P1,X,P2,urgent)]):-
-sorturgent(T1,T2).
-
-norepeat(empty, empty).
-norepeat([H|T1],L2):-
-member(H,T1),
-norepeat(T1,L2).
-norepeat([H|T1],[H|T2]):-
-norepeat(T1,T2).
