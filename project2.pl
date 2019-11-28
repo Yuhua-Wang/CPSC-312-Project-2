@@ -134,5 +134,5 @@ plan(L2,C,P1).
 %do([order(a,4,c1,urgent),order(a,2,c2,urgent)],C,P1).
 %do([order(a,4,c1,not_urgent),order(a,2,c3,not_urgent),order(a,4,b,urgent),order(a,4,b,urgent)],C,P1).
 %do([order(a,4,c5,urgent)],C,P1).
-%do([order(a,4,b,urgent),order(a,4,c,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent)],P1).
+%do([order(a,4,b,urgent),order(a,4,c,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent)],C,P1).
 
