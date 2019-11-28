@@ -136,3 +136,14 @@ plan(L2,C,P1).
 %do([order(a,4,c5,urgent)],C,P1).
 %do([order(a,4,b,urgent),order(a,4,c,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent)],C,P1).
 
+% seperateByUrgent(L1,L2,L3).
+% true if the L2 contains all urgent orders in L1 and L3 contains all not_urgent orders in L1 (all orders in L2,L3 don't have urgency).
+seperateByUrgent([],[],[]).
+seperateByUrgent([order(P1,X,P2,urgent)|T1],[order(P1,X,P2)|T2],L3):- seperateByUrgent(T1,T2,L3).
+seperateByUrgent([order(P1,X,P2,not_urgent)|T1],L2,[order(P1,X,P2)|T3]):- seperateByUrgent(T1,L2,T3).
+
+%try
+% seperateByUrgent([order(a,4,c1,not_urgent),order(a,4,c1,urgent),order(a,4,c2,urgent)],L2,L3).
+% seperateByUrgent([order(a,4,c1,urgent),order(a,4,c2,urgent)],L2,L3).
+
+
