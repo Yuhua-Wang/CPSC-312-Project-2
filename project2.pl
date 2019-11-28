@@ -59,6 +59,24 @@ shortestPath(F,T,C,P) :- findpath(F,T,C,P), \+notShortest(F,T,C,P).
 notShortest(F,T,C,P) :- findpath(F,T,C1,P1), dif(P,P1), C1<C.
 
 
+% findpdpair(Order, PDPair).
+% is true if PDPair pdpair(P,D) represents a pair of pickup(P) and delivery(D) locations of an order pickup and delivery locations
+findpdpair(order(D,_,P,_), pdpair(P,D)).
+
+
+% findAllPdpairs(Orders, PDPairs).
+% is true if PDpairs is a list that includes all pdpairs in Orders (a list of orders)
+findAllPdpairs([], []).
+findAllPdpairs( [order(C,_,R,_)|O] ,[pdpair(R,C)|P]) :- findAllPdpairs(O,P).
+
+
+% rout(PDPairs, Rout).
+% is true if Rout is a list of locations which represents a valid rout to delivery all pdpairs in PDPairs
+% for each pdpair(R,C), R must be reached before C to complete the order
+rout([],[]).
+%continuing
+
+
 % sorturgent(L1,L2):
 % true if L1 is a list of order and L2 conclude all element in L1 in correct sequence(emerge->not emerge).
 sorturgent([],[]).
@@ -72,7 +90,6 @@ sorturgent([order(P1,X,P2,not_urgent)|T1],R2):-
 append(L1,[],L1).
 append([],L2,L2).
 append([H1|T],L2,[H1|R]):- append(T,L2,R).
-
 
 % norepeat(L1, L2).
 % true if L2 is the same as L1 without duplicates
@@ -93,10 +110,7 @@ reachable(T1,T2).
 %check(L1,L2).
 % true if L2 contains all legal order in L1.
 check([],[]).
-check(L1,L4):-
-norepeat(L1,L2),
-reachable(L2,L3),
-sorturgent(L3,L4).
+check(L1,L4):- norepeat(L1,L2), reachable(L2,L3), sorturgent(L3,L4).
 
 
 % plan(L2,C,P1).
