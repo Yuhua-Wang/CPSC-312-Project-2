@@ -96,7 +96,7 @@ goThroughAllNodes(From) :-
 
 goThroughAllNodes(_).
  
-go(From, To) :-
+getShortestPath(From, To) :-
 	goThroughAllNodes(From),                  
 	currentShortestPath([To|RPath], Cost)->        
 	reverse([To|RPath], Path),     
@@ -353,4 +353,7 @@ append(Path1,Path3,Path12).
 % greedyOrderPath(a,[],[(c1,a)],Path).
 % greedyOrderPath(a,[(c1,a)],[(c1,a)],Path).
 % greedyOrderPath(a,[(c1,a),(c1,b)],[(c1,a),(c3,a)],Path).
+
+%try
+% getShortestPath(a,b).   will return the shortest path between a and b with a cost if there is such a path.
 
