@@ -1,3 +1,6 @@
+% currentShortestPath([To|ReversedPath], C)	
+% To is the goal node, ReversedPath is a reversed path. C is cost
+% currentShortestPath will store current shortest path and cost from start point to end point
 :- dynamic a/0,b/0,c1/0,c2/0,c3/0,currentShortestPath/2.
 
 %restaurant(P).
@@ -151,9 +154,6 @@ notShortestPath(F,T,C,P) :- findpath(F,T,C1,P1), dif(P,P1), C1<C.
 edge(From,To,Cost) :- connected(To,From,Cost),
                         connected(From, To, Cost).
 
-% currentShortestPath will store current shortest path and cost from start point to end point
-% To is the goal node, ReversedPath is a reversed path. C is cost
-% currentShortestPath([To|ReversedPath], C)	
 % shorterPath2 use Dijkstra algorithm to search for shortest path and cost from start point to destination
 % if new Cost is small than old C, then use Cost to replace C.
 shorterPath2([H|Path], Cost) :-		      
@@ -164,7 +164,14 @@ shorterPath2([H|Path], Cost) :-
 % if path does not exist, create a new path.
 shorterPath2(Path, Cost) :-		    
 	assert(currentShortestPath(Path,Cost)).
- 
+
+goThroughAllNodes(_). 
+
+% goThroughAllNodes(From) will remove current path and make a new path starting from the start point.
+goThroughAllNodes(From) :-
+	retractall(currentShortestPath(_,_)),        
+	goThroughAllNodes(From,[],0). 
+
 % goThroughAllNodes(From, Path, Cost) will go through every node and all unvisited neighbours and update the shortest path and cost 
 goThroughAllNodes(From, Path, Cost) :-		   
     edge(From, T, C),
@@ -173,18 +180,13 @@ goThroughAllNodes(From, Path, Cost) :-
 	shorterPath2([T,From|Path], S),
 	goThroughAllNodes(T,[From|Path], S).	  
  
-% goThroughAllNodes(From) will remove current path and make a new path starting from the start point.
-goThroughAllNodes(From) :-
-	retractall(currentShortestPath(_,_)),        
-	goThroughAllNodes(From,[],0).     
-
-goThroughAllNodes(_).
 
 % getShortestPath(From, To, Cost, Path) will return the shortest Path and minimum cost from From to To.
 getShortestPath(From, To, Cost, Path) :-
 	goThroughAllNodes(From),                  
 	currentShortestPath([To|ReversedPath], Cost),        
 	reverse([To|ReversedPath], Path).   	
+
 
 % findpdpair(Order, PDPair).
 % is true if PDPair pdpair(P,D) represents a pair of pickup(P) and delivery(D) locations of an order pickup and delivery locations
