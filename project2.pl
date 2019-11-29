@@ -65,6 +65,19 @@ connected(bb,cr,8).
 connected(yvr,rb,1).
 connected(rb,yvr,1).
 
+% hasFood(C,F) is true if Node C has food F.
+hasFood(ubc, fish).
+hasFood(kb, fish).
+hasFood(dt, fish).
+hasFood(sp, fish).
+hasFood(wv, fish).
+hasFood(nv, fish).
+hasFood(bb, fish).
+hasFood(sc, fish).
+hasFood(yvr, fish).
+hasFood(md, fish).
+hasFood(rd, fish).
+
 
 % for mapI
 connected(a, c1, 3).
