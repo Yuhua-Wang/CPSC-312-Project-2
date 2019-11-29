@@ -488,7 +488,9 @@ append(Path1,Path3,Path12).
 go(Orders,Start) :- 
 	 shortestRoute(Orders,Start,Route,Cost)->
 	 writef('shortest route is %w with cost %w\n', [Route, Cost]);
-	 writef('sorry, the path does not exist').
+	 writef('sorry, the path does not exist'),
+	 % should return false.
+	 hasFood(test,test).
 
 %try
 % go([order(ubc,2,rb,urgent,fish),order(ubc,2,bp,urgent,fish)], rb).
