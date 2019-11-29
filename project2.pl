@@ -149,7 +149,7 @@ edge(From,To,Cost) :- connected(To,From,Cost),
 % shorterPath2 use Dijkstra algorithm to search for shortest path and cost from start point to destination
 % if new Cost is small than old C, then use Cost to replace C.
 shorterPath2([H|Path], Cost) :-		      
-	currentShortestPath([H|T], C),!, Cost < C,        
+	currentShortestPath([H|_], C),!, Cost < C,
 	retract(currentShortestPath([H|_],_)),
 	assert(currentShortestPath([H|Path], Cost)).
 
@@ -205,13 +205,6 @@ findAllLocations([order(C,_,P,_,_)|O], [C,P|L]) :- findAllLocations(O,L).
 % for each pdpair(R,C), R must be reached before C to complete the order
 
 route([],[],_,_,_,0).
-
-/*
-route([pdpair(P,D)],R,F,_,V,C) :- member(P,V), shortestPath(F,D,C,R).
-route([pdpair(P,D)],R,F,_,V,C) :-
-                       \+member(P,V), shortestPath(F,P,C1,R1),shortestPath(P,D,C2,R2),
-                       C is C1+C2, append(R1,R2,R).
-*/
 route(O,R,F,A,V,C) :-
              dif(F,X), member(X,A), \+member(X,V), getShortestPath(F,X,C1,P),
              removefulfilled(O,V,X,NO), route(NO,R1,X,A,[X|V],C2),
@@ -273,7 +266,7 @@ append([H1|T],L2,[H1|R]):- append(T,L2,R).
 % sorturgent(L1,L2):
 % true if L1 is a list of order and L2 conclude all element in L1 in correct sequence(emerge->not emerge).
 sorturgent([],[]).
-sorturgent([order(P1,X,P2,urgent,F)|T1],[order(P1,X,P2,urgent)|T2]):- sorturgent(T1,T2).
+sorturgent([order(P1,X,P2,urgent,_)|T1],[order(P1,X,P2,urgent)|T2]):- sorturgent(T1,T2).
 sorturgent([order(P1,X,P2,not_urgent,F)|T1],R2):-
                      append(T2,[order(P1,X,P2,not_urgent,F)],R2), sorturgent(T1,T2).
 
@@ -289,12 +282,10 @@ norepeat([H|T1],[H|T2]):- \+member(H,T1), norepeat(T1,T2).
 
 reachable([],[]).
 reachable([order(P1,X,P2,urgent,F)|T1],[order(P1,X,P2,urgent,F)|T2]):-
-findpath(P1,P2,C,P),
-reachable(T1,T2).
+                  findpath(P1,P2,_,_),reachable(T1,T2).
 
 reachable([order(P1,X,P2,not_urgent,F)|T1],[order(P1,X,P2,not_urgent,F)|T2]):-
-findpath(P1,P2,C,P),
-reachable(T1,T2).
+             findpath(P1,P2,_,_),reachable(T1,T2).
 
 
 %check(L1,L2).
@@ -332,8 +323,8 @@ plan(L2,C,P1).
 % seperateByUrgent(L1,L2,L3).
 % true if the L2 contains all urgent orders in L1 and L3 contains all not_urgent orders in L1 (all orders in L2,L3 as pairs don't have urgency and food).
 seperateByUrgent([],[],[]).
-seperateByUrgent([order(P1,X,P2,urgent,fish)|T1],[(P1,P2)|T2],L3):- seperateByUrgent(T1,T2,L3).
-seperateByUrgent([order(P1,X,P2,not_urgent,fish)|T1],L2,[(P1,P2)|T3]):- seperateByUrgent(T1,L2,T3).
+seperateByUrgent([order(P1,_,P2,urgent,fish)|T1],[(P1,P2)|T2],L3):- seperateByUrgent(T1,T2,L3).
+seperateByUrgent([order(P1,_,P2,not_urgent,fish)|T1],L2,[(P1,P2)|T3]):- seperateByUrgent(T1,L2,T3).
 
 %try
 % seperateByUrgent([order(ubc,4,yvr,not_urgent,fish),order(a,4,c1,urgent,fish),order(a,4,c2,urgent,fish)],L2,L3).
@@ -342,31 +333,24 @@ seperateByUrgent([order(P1,X,P2,not_urgent,fish)|T1],L2,[(P1,P2)|T3]):- seperate
 % seperateByUrgent([order(ubc, 4, rb, urgent,fish), order(cr, 4, ubc, urgent,fish), order(ubc, 2, rb, not_urgent,fish), order(rb, 4, ubc, not_urgent,fish)] ,L2,L3).
 
 % nearest(F1,L1,P2,L2,C).
-% find the P1's nearest place in L1,cost C produce as P2 and rest of L1 is L2.
+% find the P1s nearest place in L1,cost C produce as P2 and rest of L1 is L2.
 nearest(_,[],empty,1000000).
 nearest(empty,[],empty,1000000).
 
 nearest(F1,[P2|T],P3,C1):-
-\+ dif(F1,P2),
-nearest(F1,T,P3,C1).
+       \+ dif(F1,P2),nearest(F1,T,P3,C1).
 
 nearest(F1,[P2|T],P2,C):-
-dif(F1,P2),
-shortestPath(F1,P2,C,Path1),
-nearest(F1,T,P3,C1),
-C<C1.
+         dif(F1,P2),shortestPath(F1,P2,C,_),
+         nearest(F1,T,_,C1),C<C1.
 
 nearest(F1,[P2|T],P2,C):-
-dif(F1,P2),
-shortestPath(F1,P2,C,Path1),
-nearest(F1,T,P3,C1),
-C=C1.
+     dif(F1,P2), shortestPath(F1,P2,C,_),
+     nearest(F1,T,_,C1), C=C1.
 
 nearest(F1,[P2|T1],P3,C1):-
-dif(F1,P2),
-shortestPath(F1,P2,C,Path1),
-nearest(F1,T1,P3,C1),
-C>C1.
+         dif(F1,P2), shortestPath(F1,P2,C,_),
+         nearest(F1,T1,P3,C1),C>C1.
 
 %try
 %nearest(a,[a,b,b],P1,C).
@@ -377,7 +361,7 @@ C>C1.
 %seperateR(L1,L2).
 % find all restaurant in L1.
 seperateR([],[]).
-seperateR([(P1,P2)|T1],[P2|T2]):-
+seperateR([(_,P2)|T1],[P2|T2]):-
 seperateR(T1,T2).
 
 %try
@@ -413,28 +397,17 @@ greedypath(empty,[],[]).
 greedypath(S,[],[S]).
 
 greedypath(S,L1,P1):-
-customer(S),
-seperateR(L1,L2),
-nearest(S,L2,P2,C),
-findReceiver(P2,L1,C1,L4),
-greedypath(C1,L4,P3),
-append([S,P2],P3,P1).
+         customer(S),seperateR(L1,L2),nearest(S,L2,P2,_),
+         findReceiver(P2,L1,C1,L4),greedypath(C1,L4,P3),append([S,P2],P3,P1).
 
 greedypath(S,L1,P1):-
-restaurant(S),
-findReceiver(S,L1,C1,L4),
-empty(C1),
-seperateR(L1,L2),
-nearest(S,L2,P2,C),
-greedypath(P2,L1,P3),
-append([S],P3,P1).
+         restaurant(S), findReceiver(S,L1,C1,_), empty(C1),
+         seperateR(L1,L2), nearest(S,L2,P2,_),
+         greedypath(P2,L1,P3), append([S],P3,P1).
 
 greedypath(S,L1,P1):-
-restaurant(S),
-findReceiver(S,L1,C1,L4),
-\+ empty(C1),
-greedypath(C1,L4,P2),
-append([S],P2,P1).
+         restaurant(S), findReceiver(S,L1,C1,L4),
+         \+ empty(C1),greedypath(C1,L4,P2),append([S],P2,P1).
 
 %try
 %greedypath(a,[(c1,a)],L1).
@@ -446,8 +419,7 @@ append([S],P2,P1).
 %end(Path,S).
 % S is the end of the list.
 end([H],H).
-end([H|T],H2):-
-end(T,H2).
+end([_|T],H2):- end(T,H2).
  
 %try
 %end([a,b,c,d],S).
@@ -455,7 +427,7 @@ end(T,H2).
 % nobegin(L1,L2).
 % L2 is L1 without the first element.
 nobegin([],[]).
-nobegin([H|L],L).
+nobegin([_|L],L).
 
 %try
 %nobegin([a,b,c,d],L).
@@ -496,6 +468,7 @@ go(Orders,Start) :-
 % go([order(cr,2,rb,urgent,hotPot),order(cr,2,bp,urgent,fries)], rb).
 % go([order(bp,3,cr,urgent,surprise), order(md,5,sc,urgent,hotPot),order(bp,1,md,urgent,fish)], bb).
 % go([order(bp,3,cr,urgent,fish), order(md,5,sc,urgent,fish),order(ubc,1,yvr,urgent,fish)], bb).
+% go([order(bp,3,cr,urgent,surprise), order(md,5,sc,urgent,hotPot),order(ubc,1,yvr,urgent,fish)], bb).
 
 
 
