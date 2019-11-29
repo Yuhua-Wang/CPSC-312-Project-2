@@ -62,11 +62,11 @@ findpath(F,T,C,P) :- path(F,T,[F],C,P).
 
 % shortestPath(From,To,Cost,Path)
 % is true if Path is a list of location representing the shortest (cheapest) path from From to To with the cost being Cost
-shortestPath(F,T,C,P) :- findpath(F,T,C,P), \+notShortest(F,T,C,P).
+shortestPath(F,T,C,P) :- findpath(F,T,C,P), \+notShortestPath(F,T,C,P).
 
-% notShortest(From,To,Cost,Path)
+% notShortestPath(From,To,Cost,Path)
 % is true if there is other path from From to To with lower cost than Cost
-notShortest(F,T,C,P) :- findpath(F,T,C1,P1), dif(P,P1), C1<C.
+notShortestPath(F,T,C,P) :- findpath(F,T,C1,P1), dif(P,P1), C1<C.
 
 % currentShortestPath will store current shortest path and cost from start point to end point
 % To is the goal node, ReversedPath is a reversed path. C is cost
@@ -110,6 +110,8 @@ printOutShortestPath(From, To) :-
 % printOutShortestPath(a,b).   will print the shortest path between a and b with a cost if there is such a path.
 % if you need to get the shortest path and cost from A to B, please use getShortestPath(A, B, Path, Cost).
 
+
+
 % findpdpair(Order, PDPair).
 % is true if PDPair pdpair(P,D) represents a pair of pickup(P) and delivery(D) locations of an order pickup and delivery locations
 findpdpair(order(D,_,P,_), pdpair(P,D)).
@@ -121,11 +123,63 @@ findAllPdpairs([], []).
 findAllPdpairs( [order(C,_,R,_)|O] ,[pdpair(R,C)|P]) :- findAllPdpairs(O,P).
 
 
-% rout(PDPairs, Rout).
-% is true if Rout is a list of locations which represents a valid rout to delivery all pdpairs in PDPairs
+% findAllLocations(Orders, Locations).
+% true if Locations is a list that contains all locations required to fulfill all orders
+findAllLocations([],[]).
+findAllLocations([order(C,_,P,_)|O], [C,P|L]) :- findAllLocations(O,L).
+
+
+% route(PDPairs, Route, From, AllLocations, Visited, Cost).
+% is true if Route is a list of locations which represents a valid route to delivery all pdpairs in PDPairs
+% From is the starting location
+% AllLocations is a list of all locations required to fulfill all orders.
+% Visited is the max number of nodes allowed to be visited (cut the route if to many locations have been visited)
+% Cost is the cost of the route
 % for each pdpair(R,C), R must be reached before C to complete the order
-rout([],[]).
-%continuing
+
+route([pdpair(P,D)],R,F,_,V,C) :- member(P,V), findpath(F,D,C,R).
+route([pdpair(P,D)],R,F,_,V,C) :-
+                       \+member(P,V), findpath(F,P,C1,R1),findpath(P,D,C2,R2),
+                       C is C1+C2, append(R1,R2,R).
+route(O,R,F,A,V,C) :-
+             dif(F,X), member(X,A), \+member(X,V), shortestPath(F,X,C1,P),
+             removefulfilled(O,V,X,NO), route(NO,R1,X,A,[X|V],C2),
+             C is C1+C2, append(P,R1,R).
+
+% try: route([pdpair(a, b), pdpair(b, c3)], R, a, [b, a, c3, b],[a],C).
+
+
+% findRoute (Orders,Start,Route,Cost).
+% is true if Route a list of locations representing a route to fulfill all orders in Orders. Cost is the Cost of the route.
+% Start is the starting location.
+findRoute(O,S,R,C) :-
+             findAllLocations(O,L), findAllPdpairs(O,P),
+             route(P,R,S,L,[S],C).
+
+% try: findRoute([order(b,2,a,urgent),order(c3,2,b,urgent)], a, R, C).
+
+
+% shortestRoute (Orders,Start,Route,Cost).
+% is true if Route a list of locations representing the shortest route to fulfill all orders in Orders. Cost is the Cost of the route.
+% Start is the starting location.
+shortestRoute(O,S,R,C):-
+             findRoute(O,S,R,C),\+notShortestRoute(O,S,R,C).
+
+% try: shortestRoute([order(b,2,a,urgent),order(c3,2,b,urgent)], a, R, C).
+
+
+% notShortestRoute(Orders,Start,Route,Cost)
+% is true if there is other path from From to To with lower cost than Cost
+notShortestRoute(O,S,R,C) :- findRoute(O,S,R1,C1), dif(R,R1), C1<C.
+
+
+% removefulfilled(PDPairs, Route, NewLocation, NewPDPairs)
+% is true if NewPDPairs is PDPairs but removing any pdpair that is fulfilled by adding the new Location NewLocation into the route Route
+% a pdpair(P,D) is fulfilled if P is reached before D
+removefulfilled([],_,_,[]).
+removefulfilled([pdpair(Y,L)|P], R, L,N) :- member(Y,R), removefulfilled(P,R,L,N).
+removefulfilled([pdpair(Y,L)|P], R, L,[pdpair(Y,L)|N]) :- \+ member(Y,R), removefulfilled(P,R,L,N).
+removefulfilled([pdpair(A,B)|P], R, L,[pdpair(A,B)|N]) :- dif(B,L), removefulfilled(P,R,L,N).
 
 
 % append(L1,L2,L3).
