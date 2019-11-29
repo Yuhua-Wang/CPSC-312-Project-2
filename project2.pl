@@ -103,8 +103,7 @@ getShortestPath(From, To, Path, Cost) :-
 
 printOutShortestPath(From, To) :-                 
 	getShortestPath(From, To, Path, Cost)->            
-	writef('shortest path is %w with cost %w\n',
-	       [Path, Cost]);
+	writef('shortest path is %w with cost %w\n', [Path, Cost]);
 	writef('There is no path from %w to %w\n', [From, To]).
 
 %try
