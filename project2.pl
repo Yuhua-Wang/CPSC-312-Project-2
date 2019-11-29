@@ -89,6 +89,23 @@ customer(c1).
 customer(c2).
 customer(c3).
 
+% for mapI
+connected(a, c1, 3).
+connected(c1, a, 3).
+connected(c1, b, 2).
+connected(b, c1, 2).
+connected(b, c3, 1).
+connected(c3, b, 1).
+connected(c1, c2, 2).
+connected(c2, c1, 2).
+
+% hasFood(C,F) is true if Node C has food F.
+hasFood(a, fish).
+hasFood(b, fish).
+hasFood(c1, fish).
+hasFood(c2, fish).
+hasFood(c3, fish).
+
 % order(C,Q,R,U,F)
 % is true if a customer at location C has ordered Q units of food from restaurants at R, and the urgency level is U. F is food
 
@@ -475,6 +492,9 @@ go(Orders,Start) :-
 % go([order(ubc,2,rb,urgent,fish),order(ubc,2,bp,urgent,fish)], rb).
 % go([order(ubc,2,rb,urgent,superFish),order(ubc,2,bp,urgent,fries)], rb).
 % go([order(cr,2,rb,urgent,hotPot),order(cr,2,bp,urgent,fries)], rb).
+% go([order(bp,3,cr,urgent,surprise), order(md,5,sc,urgent,hotPot),order(bp,1,md,urgent,fish)], bb).
+% go([order(bp,3,cr,urgent,surprise), order(md,5,sc,urgent,hotPot),order(ubc,1,yvr,urgent,fish)], bb).
+
 
 
 
