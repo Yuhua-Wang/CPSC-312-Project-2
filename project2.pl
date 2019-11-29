@@ -67,18 +67,31 @@ connected(rb,yvr,1).
 
 % hasFood(C,F) is true if Node C has food F.
 hasFood(ubc, fish).
+hasFood(ubc, pizza).
 hasFood(kb, fish).
+hasFood(kb, cheeseBurger).
 hasFood(dt, fish).
+hasFood(dt, steak).
 hasFood(sp, fish).
+hasFood(sp, sushi).
 hasFood(wv, fish).
+hasFood(wv, friedRice).
 hasFood(nv, fish).
+hasFood(nv, rocketBurger).
 hasFood(bb, fish).
+hasFood(bb, premiumBeef).
 hasFood(sc, fish).
+hasFood(sc, hotPot).
 hasFood(yvr, fish).
+hasFood(yvr, starbucks).
 hasFood(md, fish).
+hasFood(md, chickenTeriyaki).
 hasFood(rb, fish).
+hasFood(rb, superFish).
 hasFood(bp, fish).
+hasFood(bp, fries).
 hasFood(cr, fish).
+hasFood(cr, surprise).
 
 
 % for mapI
