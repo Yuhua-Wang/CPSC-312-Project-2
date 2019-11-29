@@ -15,21 +15,8 @@ customer(c3).
 
 % the following is defined for Map I on google doc
 % e.g. robots can go from a to c1 with a cost of 2:
-connected(a, c1, 2).
-connected(c1, a, 2).
-connected(c1, b, 1).
-connected(b, c1, 1).
-connected(b, c3, 3).
-connected(c3, b, 3).
-connected(c1, c2, 4).
-connected(c2, c1, 4).
 
-% hasFood(C,F) is true if Node C has food F.
-hasFood(a, fish).
-hasFood(b, fish).
-hasFood(c1, fish).
-hasFood(c2, fish).
-hasFood(c3, fish).
+
 /*
 % tests written for shortestPath
 connected(j,k,5).
@@ -38,6 +25,64 @@ connected(i,o,10).
 connected(o,l,10).
 connected(j,i,1).
 */
+
+connected(ubc,kb,6).
+connected(kb,ubc,6).
+connected(kb,dt,1).
+connected(dt,kb,1).
+connected(dt,sp,3).
+connected(sp,dt,3).
+connected(sp,wv,3).
+connected(wv,sp,3).
+connected(sp,nv,5).
+connected(nv,sp,5).
+connected(wv,nv,5).
+connected(nv,wv,5).
+connected(dt,bb,6).
+connected(bb,dt,6).
+connected(nv,bb,8).
+connected(bb,nv,8).
+connected(dt,sc,3).
+connected(sc,dt,3).
+connected(sc,bb,4).
+connected(bb,sc,4).
+connected(ubc,md,8).
+connected(md,ubc,8).
+connected(md,sc,4).
+connected(sc,md,4).
+connected(md,yvr,2).
+connected(yvr,md,2).
+connected(md,bp,4).
+connected(bp,md,4).
+connected(bp,yvr,1).
+connected(yvr,bp,1).
+connected(bp,rb,2).
+connected(rb,bp,2).
+connected(bp,cr,2).
+connected(cr,bp,2).
+connected(cr,bb,8).
+connected(bb,cr,8).
+connected(yvr,rb,1).
+connected(rb,yvr,1).
+
+
+% for mapI
+connected(a, c1, 3).
+connected(c1, a, 3).
+connected(c1, b, 2).
+connected(b, c1, 2).
+connected(b, c3, 1).
+connected(c3, b, 1).
+connected(c1, c2, 2).
+connected(c2, c1, 2).
+
+% hasFood(C,F) is true if Node C has food F.
+hasFood(a, fish).
+hasFood(b, fish).
+hasFood(c1, fish).
+hasFood(c2, fish).
+hasFood(c3, fish).
+
 
 % order(C,Q,R,U, F)
 % is true if a customer at location C has ordered Q units of food from restaurants at R, and the urgency level is U. F is food
@@ -143,10 +188,14 @@ findAllLocations([order(C,_,P,_,_)|O], [C,P|L]) :- findAllLocations(O,L).
 % Cost is the cost of the route
 % for each pdpair(R,C), R must be reached before C to complete the order
 
-route([pdpair(P,D)],R,F,_,V,C) :- member(P,V), getShortestPath(F,D,C,R).
+route([],[],_,_,_,0).
+
+/*
+route([pdpair(P,D)],R,F,_,V,C) :- member(P,V), shortestPath(F,D,C,R).
 route([pdpair(P,D)],R,F,_,V,C) :-
-                       \+member(P,V), getShortestPath(F,P,C1,R1),getShortestPath(P,D,C2,R2),
+                       \+member(P,V), shortestPath(F,P,C1,R1),shortestPath(P,D,C2,R2),
                        C is C1+C2, append(R1,R2,R).
+*/
 route(O,R,F,A,V,C) :-
              dif(F,X), member(X,A), \+member(X,V), getShortestPath(F,X,C1,P),
              removefulfilled(O,V,X,NO), route(NO,R1,X,A,[X|V],C2),
