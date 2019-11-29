@@ -413,4 +413,12 @@ append(Path1,Path3,Path12).
 % greedyOrderPath(a,[(c1,a)],[(c1,a)],Path).
 % greedyOrderPath(a,[(c1,a),(c1,b)],[(c1,a),(c3,a)],Path).
 
+go(Orders,Start) :- 
+	 shortestRoute(Orders,Start,Route,Cost)->
+	 writef('shortest route is %w with cost %w\n', [Route, Cost]);
+	 writef('sorry, the path does not exist').
+
+%try
+% go([order(b,2,a,urgent),order(c3,2,b,urgent)], a).
+
 
