@@ -1,4 +1,4 @@
-% currentShortestPath([To|ReversedPath], C)	
+\% currentShortestPath([To|ReversedPath], C)	
 % To is the goal node, ReversedPath is a reversed path. C is cost
 % currentShortestPath will store current shortest path and cost from start point to end point
 :- dynamic a/0,b/0,c1/0,c2/0,c3/0,currentShortestPath/2.
@@ -226,7 +226,7 @@ findRoute(O,S,R,C) :-
              findAllLocations(O,L), findAllPdpairs(O,P), 
              route(P,R,S,L,[S],C).
 
-% try: findRoute([order(br,2,ubc,urgent,fish),order(yvr,2,br,urgent,fish)], ubc, R, C).
+% try: findRoute([order(a,2,b,urgent,fish),order(c2,2,c3,urgent,fish)], b, R, C).
 
 % isValidFood(Orders) will check whether in all orders, each restaurant has the food ordered by the customer.
 isValidFood([]).
