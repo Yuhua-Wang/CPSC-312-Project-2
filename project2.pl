@@ -207,7 +207,7 @@ findRoute(O,S,R,C) :-
              findAllLocations(O,L), findAllPdpairs(O,P), 
              route(P,R,S,L,[S],C).
 
-% try: findRoute([order(b,2,a,urgent,fish),order(c3,2,b,urgent,fish)], a, R, C).
+% try: findRoute([order(br,2,ubc,urgent,fish),order(yvr,2,br,urgent,fish)], ubc, R, C).
 
 % isValidFood(Orders) will check whether in all orders, each restaurant has the food ordered by the customer.
 isValidFood([]).
@@ -284,8 +284,8 @@ check([],[]).
 check(L1,L4):- norepeat(L1,L2), reachable(L2,L3), sorturgent(L3,L4).
 
 %try
-%check([order(a,4,c1,urgent,F),order(a,2,c2,urgent,F)],L2).
-%check([order(c1,4,a,not_urgent,F),order(c3,2,a,not_urgent,F),order(c2,4,b,urgent,F),order(c1,4,b,urgent,F)],L2).
+%check([order(ubc,4,yvr,urgent,fish),order(yvr,2,rb,urgent,fish)],L2).
+%check([order(ubc,4,yvr,not_urgent,fish),order(yvr,2,rb,not_urgent,fish),order(rb,4,yvr,urgent,fish),order(ubc,4,yvr,urgent,fish)],L2).
 
 % plan(L2,C,P1).
 % true if P1 gives the path that the robot can finish all the order.
