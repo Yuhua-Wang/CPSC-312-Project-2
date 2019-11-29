@@ -251,7 +251,7 @@ removefulfilled([pdpair(Y,L)|P], R, L,[pdpair(Y,L)|N]) :- \+ member(Y,R), remove
 removefulfilled([pdpair(A,B)|P], R, L,[pdpair(A,B)|N]) :- dif(B,L), removefulfilled(P,R,L,N).
 
 
-% append(L1,L2,L3).
+% append(List1,List2,AppendList).
 % is true if L3 is the list made by appending L1 and L2
 append([],[],[]).
 append(L1,[],L1).
@@ -263,7 +263,7 @@ append([H1|T],L2,[H1|R]):- append(T,L2,R).
 % append([a,b],[],L).
 % append([],[c],L).
 
-% sorturgent(L1,L2):
+% sorturgent(Orders,SortedOrders):
 % true if L1 is a list of order and L2 conclude all element in L1 in correct sequence(emerge->not emerge).
 sorturgent([],[]).
 sorturgent([order(P1,X,P2,urgent,_)|T1],[order(P1,X,P2,urgent)|T2]):- sorturgent(T1,T2).
@@ -271,13 +271,13 @@ sorturgent([order(P1,X,P2,not_urgent,F)|T1],R2):-
                      append(T2,[order(P1,X,P2,not_urgent,F)],R2), sorturgent(T1,T2).
 
 
-% norepeat(L1, L2).
+% norepeat(Orders, NorepeatOrders).
 % true if L2 is the same as L1 without duplicates
 norepeat([], []).
 norepeat([H|T1],L2) :- member(H,T1), norepeat(T1,L2).
 norepeat([H|T1],[H|T2]):- \+member(H,T1), norepeat(T1,T2).
 
-%reachable(L1,L2).
+%reachable(Orders,ReachableOrders).
 % true if L2 contains all elements in L1 whose receiver place is reachable from the restefrant.
 
 reachable([],[]).
@@ -288,7 +288,7 @@ reachable([order(P1,X,P2,not_urgent,F)|T1],[order(P1,X,P2,not_urgent,F)|T2]):-
              findpath(P1,P2,_,_),reachable(T1,T2).
 
 
-%check(L1,L2).
+%check(Orders,CheckedOders).
 % true if L2 contains all legal order in L1.
 check([],[]).
 check(L1,L4):- norepeat(L1,L2), reachable(L2,L3), sorturgent(L3,L4).
@@ -297,7 +297,7 @@ check(L1,L4):- norepeat(L1,L2), reachable(L2,L3), sorturgent(L3,L4).
 %check([order(ubc,4,yvr,urgent,fish),order(yvr,2,rb,urgent,fish)],L2).
 %check([order(ubc,4,yvr,not_urgent,fish),order(yvr,2,rb,not_urgent,fish),order(rb,4,yvr,urgent,fish),order(ubc,4,yvr,urgent,fish)],L2).
 
-% plan(L2,C,P1).
+% plan(Orders,Cost,Path).
 % true if P1 gives the path that the robot can finish all the order.
 plan([],0,[]).
 plan([order(P1,_,P2,_,_)|L2],C,P30):-
@@ -320,7 +320,7 @@ plan(L2,C,P1).
 %do([order(rb,4,ubc,urgent,fish)],C,P1).
 
 
-% seperateByUrgent(L1,L2,L3).
+% seperateByUrgent(Orders,Urgent,Not_Urgent).
 % true if the L2 contains all urgent orders in L1 and L3 contains all not_urgent orders in L1 (all orders in L2,L3 as pairs don't have urgency and food).
 seperateByUrgent([],[],[]).
 seperateByUrgent([order(P1,_,P2,urgent,fish)|T1],[(P1,P2)|T2],L3):- seperateByUrgent(T1,T2,L3).
@@ -332,8 +332,8 @@ seperateByUrgent([order(P1,_,P2,not_urgent,fish)|T1],L2,[(P1,P2)|T3]):- seperate
 
 % seperateByUrgent([order(ubc, 4, rb, urgent,fish), order(cr, 4, ubc, urgent,fish), order(ubc, 2, rb, not_urgent,fish), order(rb, 4, ubc, not_urgent,fish)] ,L2,L3).
 
-% nearest(F1,L1,P2,L2,C).
-% find the P1s nearest place in L1,cost C produce as P2 and rest of L1 is L2.
+% nearest(Place1,List1,Place2,List2,Cost).
+% find the Place1's nearest place in L1,cost C produce as P2 and rest of L1 is L2.
 nearest(_,[],empty,1000000).
 nearest(empty,[],empty,1000000).
 
@@ -358,7 +358,7 @@ nearest(F1,[P2|T1],P3,C1):-
 %nearest(a,[b,b,b,b,b],P1,C).
 %nearest(a,[a],P1,C).
 
-%seperateR(L1,L2).
+%seperateR(List1,List2).
 % find all restaurant in L1.
 seperateR([],[]).
 seperateR([(_,P2)|T1],[P2|T2]):-
@@ -370,7 +370,7 @@ seperateR(T1,T2).
 %seperateR([(c2, b),  (c1, b)],L).
 %seperateR([(c3, a),  (c1, a)],L).
 
-%findReceiver(R1,L1,C1,L2).
+%findReceiver(Restaurant1,List1,Reiceiver1,List2).
 % find the receiver of restaurant R1 in the order pairs and drop that pair from the list of order to make L2.
 findReceiver(_,[],empty,[]).
 findReceiver(empty,[],empty,[]).
@@ -391,7 +391,7 @@ findReceiver(R1,[(C1,R1)|T1],C1,T1).
 empty(empty).
 empty([]).
 
-%greedypath(S,L1,P1)
+%greedypath(Start,Order1,Path1)
 %produce the shortest path that the robot need to take for a list of pairs of places.
 greedypath(empty,[],[]).
 greedypath(S,[],[S]).
@@ -416,7 +416,7 @@ greedypath(S,L1,P1):-
 %greedypath(a,[(c2,a),(c1,b)],L1).
 
 
-%end(Path,S).
+%end(Path,End).
 % S is the end of the list.
 end([H],H).
 end([_|T],H2):- end(T,H2).
@@ -424,7 +424,7 @@ end([_|T],H2):- end(T,H2).
 %try
 %end([a,b,c,d],S).
  
-% nobegin(L1,L2).
+% nobegin(List1,List2).
 % L2 is L1 without the first element.
 nobegin([],[]).
 nobegin([_|L],L).
@@ -432,7 +432,7 @@ nobegin([_|L],L).
 %try
 %nobegin([a,b,c,d],L).
 
-%greedyOderPath(S,L1,L2,P1).
+%greedyOderPath(Start,List1,List2,Path1).
 % given an urgent order L1,not urgent Order L2, produce a path that using greedy algorithm.
 greedyOrderPath(_,[],[],[]).
 greedyOrderPath(empty,_,_,[]).
