@@ -24,6 +24,12 @@ connected(c3, b, 3).
 connected(c1, c2, 4).
 connected(c2, c1, 4).
 
+% hasFood(C,F) is true if Node C has food F.
+hasFood(a, fish).
+hasFood(b, fish).
+hasFood(c1, fish).
+hasFood(c2, fish).
+hasFood(c3, fish).
 /*
 % tests written for shortestPath
 connected(j,k,5).
@@ -33,14 +39,14 @@ connected(o,l,10).
 connected(j,i,1).
 */
 
-% order(C,Q,R,U)
-% is true if a customer at location C has ordered Q units of food from restaurants at R, and the urgency level is U.
+% order(C,Q,R,U, F)
+% is true if a customer at location C has ordered Q units of food from restaurants at R, and the urgency level is U. F is food
 
 % the following is defined for Map I
 % e.g. customer at c3 has ordered 2 units of food from A. This order is urgent.
-order(c3, 2, a, urgent).
-order(c2, 1, b, not_urgent).
-order(c1, 1, b, not_urgent).
+order(c3, 2, a, urgent, fish).
+order(c2, 1, b, not_urgent, fish).
+order(c1, 1, b, not_urgent, fish).
 
 
 % path(From,To,Visited,Cost,Path)
@@ -114,19 +120,19 @@ printOutShortestPath(From, To) :-
 
 % findpdpair(Order, PDPair).
 % is true if PDPair pdpair(P,D) represents a pair of pickup(P) and delivery(D) locations of an order pickup and delivery locations
-findpdpair(order(D,_,P,_), pdpair(P,D)).
+findpdpair(order(D,_,P,_,_), pdpair(P,D)).
 
 
 % findAllPdpairs(Orders, PDPairs).
 % is true if PDpairs is a list that includes all pdpairs in Orders (a list of orders)
 findAllPdpairs([], []).
-findAllPdpairs( [order(C,_,R,_)|O] ,[pdpair(R,C)|P]) :- findAllPdpairs(O,P).
+findAllPdpairs( [order(C,_,R,_,_)|O] ,[pdpair(R,C)|P]) :- findAllPdpairs(O,P).
 
 
 % findAllLocations(Orders, Locations).
 % true if Locations is a list that contains all locations required to fulfill all orders
 findAllLocations([],[]).
-findAllLocations([order(C,_,P,_)|O], [C,P|L]) :- findAllLocations(O,L).
+findAllLocations([order(C,_,P,_,_)|O], [C,P|L]) :- findAllLocations(O,L).
 
 
 % route(PDPairs, Route, From, AllLocations, Visited, Cost).
@@ -156,7 +162,7 @@ findRoute(O,S,R,C) :-
              findAllLocations(O,L), findAllPdpairs(O,P),
              route(P,R,S,L,[S],C).
 
-% try: findRoute([order(b,2,a,urgent),order(c3,2,b,urgent)], a, R, C).
+% try: findRoute([order(b,2,a,urgent,fish),order(c3,2,b,urgent,fish)], a, R, C).
 
 
 % shortestRoute (Orders,Start,Route,Cost).
@@ -165,7 +171,7 @@ findRoute(O,S,R,C) :-
 shortestRoute(O,S,R,C):-
              findRoute(O,S,R,C),\+notShortestRoute(O,S,R,C).
 
-% try: shortestRoute([order(b,2,a,urgent),order(c3,2,b,urgent)], a, R, C).
+% try: shortestRoute([order(b,2,a,urgent,fish),order(c3,2,b,urgent,fish)], a, R, C).
 
 
 % notShortestRoute(Orders,Start,Route,Cost)
@@ -197,9 +203,9 @@ append([H1|T],L2,[H1|R]):- append(T,L2,R).
 % sorturgent(L1,L2):
 % true if L1 is a list of order and L2 conclude all element in L1 in correct sequence(emerge->not emerge).
 sorturgent([],[]).
-sorturgent([order(P1,X,P2,urgent)|T1],[order(P1,X,P2,urgent)|T2]):- sorturgent(T1,T2).
-sorturgent([order(P1,X,P2,not_urgent)|T1],R2):-
-                     append(T2,[order(P1,X,P2,not_urgent)],R2), sorturgent(T1,T2).
+sorturgent([order(P1,X,P2,urgent,F)|T1],[order(P1,X,P2,urgent)|T2]):- sorturgent(T1,T2).
+sorturgent([order(P1,X,P2,not_urgent,F)|T1],R2):-
+                     append(T2,[order(P1,X,P2,not_urgent,F)],R2), sorturgent(T1,T2).
 
 
 % norepeat(L1, L2).
@@ -212,11 +218,11 @@ norepeat([H|T1],[H|T2]):- \+member(H,T1), norepeat(T1,T2).
 % true if L2 contains all elements in L1 whose receiver place is reachable from the restefrant.
 
 reachable([],[]).
-reachable([order(P1,X,P2,urgent)|T1],[order(P1,X,P2,urgent)|T2]):-
+reachable([order(P1,X,P2,urgent,F)|T1],[order(P1,X,P2,urgent,F)|T2]):-
 findpath(P1,P2,C,P),
 reachable(T1,T2).
 
-reachable([order(P1,X,P2,not_urgent)|T1],[order(P1,X,P2,not_urgent)|T2]):-
+reachable([order(P1,X,P2,not_urgent,F)|T1],[order(P1,X,P2,not_urgent,F)|T2]):-
 findpath(P1,P2,C,P),
 reachable(T1,T2).
 
@@ -227,20 +233,20 @@ check([],[]).
 check(L1,L4):- norepeat(L1,L2), reachable(L2,L3), sorturgent(L3,L4).
 
 %try
-%check([order(a,4,c1,urgent),order(a,2,c2,urgent)],L2).
-%check([order(c1,4,a,not_urgent),order(c3,2,a,not_urgent),order(c2,4,b,urgent),order(c1,4,b,urgent)],L2).
+%check([order(a,4,c1,urgent,F),order(a,2,c2,urgent,F)],L2).
+%check([order(c1,4,a,not_urgent,F),order(c3,2,a,not_urgent,F),order(c2,4,b,urgent,F),order(c1,4,b,urgent,F)],L2).
 
 % plan(L2,C,P1).
 % true if P1 gives the path that the robot can finish all the order.
 plan([],0,[]).
-plan([order(P1,_,P2,_)|L2],C,P30):-
+plan([order(P1,_,P2,_,_)|L2],C,P30):-
 findpath(P1,P2,C1,P10),
 plan(L2,C2,P20),
 C is C1+C2,
 append(P10,P20,P30).
 
 %try
-%plan([order(a,4,c1,urgent)],C,P1).
+%plan([order(a,4,c1,urgent,F)],C,P1).
 
 % do(Order,Cost,Path)
 % a general Path of Order and its cost are produced.
@@ -250,24 +256,24 @@ check(L1,L2),
 plan(L2,C,P1).
 
 %try
-%do([order(a,4,c1,urgent)],C,P1).
-%do([order(a,4,c1,urgent),order(a,2,c2,urgent)],C,P1).
-%do([order(c1,4,a,not_urgent),order(c3,2,a,not_urgent),order(c2,4,b,urgent),order(c1,4,b,urgent)],C,P1).
-%do([order(a,4,c5,urgent)],C,P1).
-%do([order(a,4,b,urgent),order(a,4,c,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent),order(a,4,b,urgent)],C,P1).
+%do([order(a,4,c1,urgent,fish)],C,P1).
+%do([order(a,4,c1,urgent,fish),order(a,2,c2,urgent,fish)],C,P1).
+%do([order(c1,4,a,not_urgent,fish),order(c3,2,a,not_urgent,fish),order(c2,4,b,urgent,fish),order(c1,4,b,urgent,fish)],C,P1).
+%do([order(a,4,c5,urgent,fish)],C,P1).
+%do([order(a,4,b,urgent,fish),order(a,4,c,urgent,fish),order(a,4,b,urgent,fish),order(a,4,b,urgent,fish),order(a,4,b,urgent,fish),order(a,4,b,urgent,fish),order(a,4,b,urgent,fish)],C,P1).
 
 
 % seperateByUrgent(L1,L2,L3).
 % true if the L2 contains all urgent orders in L1 and L3 contains all not_urgent orders in L1 (all orders in L2,L3 as pairs don't have urgency and food).
 seperateByUrgent([],[],[]).
-seperateByUrgent([order(P1,X,P2,urgent)|T1],[(P1,P2)|T2],L3):- seperateByUrgent(T1,T2,L3).
-seperateByUrgent([order(P1,X,P2,not_urgent)|T1],L2,[(P1,P2)|T3]):- seperateByUrgent(T1,L2,T3).
+seperateByUrgent([order(P1,X,P2,urgent,fish)|T1],[(P1,P2)|T2],L3):- seperateByUrgent(T1,T2,L3).
+seperateByUrgent([order(P1,X,P2,not_urgent,fish)|T1],L2,[(P1,P2)|T3]):- seperateByUrgent(T1,L2,T3).
 
 %try
-% seperateByUrgent([order(a,4,c1,not_urgent),order(a,4,c1,urgent),order(a,4,c2,urgent)],L2,L3).
-% seperateByUrgent([order(a,4,c1,urgent),order(a,4,c2,urgent)],L2,L3).
+% seperateByUrgent([order(a,4,c1,not_urgent,fish),order(a,4,c1,urgent,fish),order(a,4,c2,urgent,fish)],L2,L3).
+% seperateByUrgent([order(a,4,c1,urgent,fish),order(a,4,c2,urgent,fish)],L2,L3).
 
-% seperateByUrgent([order(c2, 4, b, urgent), order(c1, 4, b, urgent), order(c3, 2, a, not_urgent), order(c1, 4, a, not_urgent)] ,L2,L3).
+% seperateByUrgent([order(c2, 4, b, urgent,fish), order(c1, 4, b, urgent,fish), order(c3, 2, a, not_urgent,fish), order(c1, 4, a, not_urgent,fish)] ,L2,L3).
 
 % nearest(F1,L1,P2,L2,C).
 % find the P1's nearest place in L1,cost C produce as P2 and rest of L1 is L2.
@@ -419,6 +425,6 @@ go(Orders,Start) :-
 	 writef('sorry, the path does not exist').
 
 %try
-% go([order(b,2,a,urgent),order(c3,2,b,urgent)], a).
+% go([order(b,2,a,urgent,fish),order(c3,2,b,urgent,fish)], a).
 
 
