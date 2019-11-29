@@ -48,6 +48,15 @@ connected(bb,cr,8).
 connected(yvr,rb,1).
 connected(rb,yvr,1).
 
+% for mapI
+connected(a, c1, 3).
+connected(c1, a, 3).
+connected(c1, b, 2).
+connected(b, c1, 2).
+connected(b, c3, 1).
+connected(c3, b, 1).
+connected(c1, c2, 2).
+connected(c2, c1, 2).
 
 % hasFood(C,F) is true if Node C has food F.
 
@@ -78,6 +87,13 @@ hasFood(bp, fries).
 hasFood(cr, fish).
 hasFood(cr, surprise).
 
+% hasFood(C,F) is true if Node C has food F. For Map I
+hasFood(a, fish).
+hasFood(b, fish).
+hasFood(c1, fish).
+hasFood(c2, fish).
+hasFood(c3, fish).
+
 %restaurant(P).
 % true if P is a restaurant.
 restaurant(a).
@@ -89,22 +105,7 @@ customer(c1).
 customer(c2).
 customer(c3).
 
-% for mapI
-connected(a, c1, 3).
-connected(c1, a, 3).
-connected(c1, b, 2).
-connected(b, c1, 2).
-connected(b, c3, 1).
-connected(c3, b, 1).
-connected(c1, c2, 2).
-connected(c2, c1, 2).
 
-% hasFood(C,F) is true if Node C has food F.
-hasFood(a, fish).
-hasFood(b, fish).
-hasFood(c1, fish).
-hasFood(c2, fish).
-hasFood(c3, fish).
 
 % order(C,Q,R,U,F)
 % is true if a customer at location C has ordered Q units of food from restaurants at R, and the urgency level is U. F is food
