@@ -96,13 +96,13 @@ goThroughAllNodes(From) :-
 
 goThroughAllNodes(_).
  
-getShortestPath(From, To, Path, Cost) :-
+getShortestPath(From, To, Cost, Path) :-
 	goThroughAllNodes(From),                  
 	currentShortestPath([To|ReversedPath], Cost),        
 	reverse([To|ReversedPath], Path).   	
 
 printOutShortestPath(From, To) :-                 
-	getShortestPath(From, To, Path, Cost)->            
+	getShortestPath(From, To, Cost, Path)->            
 	writef('shortest path is %w with cost %w\n', [Path, Cost]);
 	writef('There is no path from %w to %w\n', [From, To]).
 
@@ -137,12 +137,12 @@ findAllLocations([order(C,_,P,_)|O], [C,P|L]) :- findAllLocations(O,L).
 % Cost is the cost of the route
 % for each pdpair(R,C), R must be reached before C to complete the order
 
-route([pdpair(P,D)],R,F,_,V,C) :- member(P,V), findpath(F,D,C,R).
+route([pdpair(P,D)],R,F,_,V,C) :- member(P,V), getShortestPath(F,D,C,R).
 route([pdpair(P,D)],R,F,_,V,C) :-
-                       \+member(P,V), findpath(F,P,C1,R1),findpath(P,D,C2,R2),
+                       \+member(P,V), getShortestPath(F,P,C1,R1),getShortestPath(P,D,C2,R2),
                        C is C1+C2, append(R1,R2,R).
 route(O,R,F,A,V,C) :-
-             dif(F,X), member(X,A), \+member(X,V), shortestPath(F,X,C1,P),
+             dif(F,X), member(X,A), \+member(X,V), getShortestPath(F,X,C1,P),
              removefulfilled(O,V,X,NO), route(NO,R1,X,A,[X|V],C2),
              C is C1+C2, append(P,R1,R).
 
@@ -412,6 +412,5 @@ append(Path1,Path3,Path12).
 % greedyOrderPath(a,[],[(c1,a)],Path).
 % greedyOrderPath(a,[(c1,a)],[(c1,a)],Path).
 % greedyOrderPath(a,[(c1,a),(c1,b)],[(c1,a),(c3,a)],Path).
-
 
 
