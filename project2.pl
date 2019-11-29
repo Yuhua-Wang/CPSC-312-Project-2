@@ -96,14 +96,20 @@ goThroughAllNodes(From) :-
 
 goThroughAllNodes(_).
  
-getShortestPath(From, To) :-
+getShortestPath(From, To, Path, Cost) :-
 	goThroughAllNodes(From),                  
-	currentShortestPath([To|RPath], Cost)->        
-	reverse([To|RPath], Path),     
+	currentShortestPath([To|ReversedPath], Cost),        
+	reverse([To|ReversedPath], Path).   	
+
+printOutShortestPath(From, To) :-                 
+	getShortestPath(From, To, Path, Cost)->            
 	writef('shortest path is %w with cost %w\n',
 	       [Path, Cost]);
 	writef('There is no path from %w to %w\n', [From, To]).
- 
+
+%try
+% printOutShortestPath(a,b).   will print the shortest path between a and b with a cost if there is such a path.
+% if you need to get the shortest path and cost from A to B, please use getShortestPath(A, B, Path, Cost).
 
 % findpdpair(Order, PDPair).
 % is true if PDPair pdpair(P,D) represents a pair of pickup(P) and delivery(D) locations of an order pickup and delivery locations
@@ -354,6 +360,5 @@ append(Path1,Path3,Path12).
 % greedyOrderPath(a,[(c1,a)],[(c1,a)],Path).
 % greedyOrderPath(a,[(c1,a),(c1,b)],[(c1,a),(c3,a)],Path).
 
-%try
-% getShortestPath(a,b).   will return the shortest path between a and b with a cost if there is such a path.
+
 
