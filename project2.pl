@@ -233,7 +233,8 @@ isValidFood([]).
 isValidFood([order(_,_,R,_,F)|H]) :-
 	hasFood(R,F)->
 	isValidFood(H);
-	writef('sorry, restaurant at %w does not have food %w\n',[R,F]).
+	writef('sorry, restaurant at %w does not have food %w\n',[R,F]),
+	hasFood(test,test).
 
 % shortestRoute (Orders,Start,Route,Cost).
 % is true if Route a list of locations representing the shortest route to fulfill all orders in Orders. Cost is the Cost of the route.
