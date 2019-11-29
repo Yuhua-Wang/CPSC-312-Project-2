@@ -156,13 +156,6 @@ shorterPath2([H|Path], Cost) :-
 shorterPath2(Path, Cost) :-		    
 	assert(currentShortestPath(Path,Cost)).
 
-goThroughAllNodes(_). 
-
-% goThroughAllNodes(From) will remove current path and make a new path starting from the start point.
-goThroughAllNodes(From) :-
-	retractall(currentShortestPath(_,_)),        
-	goThroughAllNodes(From,[],0). 
-
 % goThroughAllNodes(From, Path, Cost) will go through every node and all unvisited neighbours and update the shortest path and cost 
 goThroughAllNodes(From, Path, Cost) :-		   
     edge(From, T, C),
@@ -170,7 +163,13 @@ goThroughAllNodes(From, Path, Cost) :-
 	S is C+Cost,
 	shorterPath2([T,From|Path], S),
 	goThroughAllNodes(T,[From|Path], S).	  
- 
+
+% goThroughAllNodes(From) will remove current path and make a new path starting from the start point.
+goThroughAllNodes(From) :-
+	retractall(currentShortestPath(_,_)),        
+	goThroughAllNodes(From,[],0). 
+
+goThroughAllNodes(_). 	
 
 % getShortestPath(From, To, Cost, Path) will return the shortest Path and minimum cost from From to To.
 getShortestPath(From, To, Cost, Path) :-
@@ -216,6 +215,8 @@ route(O,R,F,A,V,C) :-
              dif(F,X), member(X,A), \+member(X,V), getShortestPath(F,X,C1,P),
              removefulfilled(O,V,X,NO), route(NO,R1,X,A,[X|V],C2),
              C is C1+C2, append(P,R1,R).
+
+% try: route([pdpair(a, b), pdpair(b, c3)], R, a, [b, a, c3, b],[a],C).
 
 % findRoute (Orders,Start,Route,Cost).
 % is true if Route a list of locations representing a route to fulfill all orders in Orders. Cost is the Cost of the route.
@@ -493,7 +494,7 @@ go(Orders,Start) :-
 % go([order(ubc,2,rb,urgent,superFish),order(ubc,2,bp,urgent,fries)], rb).
 % go([order(cr,2,rb,urgent,hotPot),order(cr,2,bp,urgent,fries)], rb).
 % go([order(bp,3,cr,urgent,surprise), order(md,5,sc,urgent,hotPot),order(bp,1,md,urgent,fish)], bb).
-% go([order(bp,3,cr,urgent,surprise), order(md,5,sc,urgent,hotPot),order(ubc,1,yvr,urgent,fish)], bb).
+% go([order(bp,3,cr,urgent,fish), order(md,5,sc,urgent,fish),order(ubc,1,yvr,urgent,fish)], bb).
 
 
 
