@@ -76,7 +76,7 @@ notShortestPath(F,T,C,P) :- findpath(F,T,C1,P1), dif(P,P1), C1<C.
 edge(From,To,Cost) :- connected(To,From,Cost),
                         connected(From, To, Cost).
 shorterPath2([H|Path], Cost) :-		      
-	currentShortestPath([H|T], C), Cost < C,        
+	currentShortestPath([H|T], C),!, Cost < C,        
 	retract(currentShortestPath([H|_],_)),
 	assert(currentShortestPath([H|Path], Cost)).
 
