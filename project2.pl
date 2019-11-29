@@ -3,31 +3,11 @@
 % currentShortestPath will store current shortest path and cost from start point to end point
 :- dynamic a/0,b/0,c1/0,c2/0,c3/0,currentShortestPath/2.
 
-%restaurant(P).
-% true if P is a restaurant.
-restaurant(a).
-restaurant(b).
 
-%customer(P).
-% true if P is a customer.
-customer(c1).
-customer(c2).
-customer(c3).
 % connected(X,Y,C)
 % is true if the robot can move from location X to location Y with a cost of C
-
 % the following is defined for Map I on google doc
-% e.g. robots can go from a to c1 with a cost of 2:
-
-
-/*
-% tests written for shortestPath
-connected(j,k,5).
-connected(k,l,5).
-connected(i,o,10).
-connected(o,l,10).
-connected(j,i,1).
-*/
+% e.g. robots can go from ubc to kb with a cost of 6:
 
 connected(ubc,kb,6).
 connected(kb,ubc,6).
@@ -68,7 +48,9 @@ connected(bb,cr,8).
 connected(yvr,rb,1).
 connected(rb,yvr,1).
 
+
 % hasFood(C,F) is true if Node C has food F.
+
 hasFood(ubc, fish).
 hasFood(ubc, pizza).
 hasFood(kb, fish).
@@ -97,32 +79,14 @@ hasFood(cr, fish).
 hasFood(cr, surprise).
 
 
-% for mapI
-connected(a, c1, 3).
-connected(c1, a, 3).
-connected(c1, b, 2).
-connected(b, c1, 2).
-connected(b, c3, 1).
-connected(c3, b, 1).
-connected(c1, c2, 2).
-connected(c2, c1, 2).
-
-% hasFood(C,F) is true if Node C has food F.
-hasFood(a, fish).
-hasFood(b, fish).
-hasFood(c1, fish).
-hasFood(c2, fish).
-hasFood(c3, fish).
-
-
-% order(C,Q,R,U, F)
+% order(C,Q,R,U,F)
 % is true if a customer at location C has ordered Q units of food from restaurants at R, and the urgency level is U. F is food
 
 % the following is defined for Map I
-% e.g. customer at c3 has ordered 2 units of food from A. This order is urgent.
-order(c3, 2, a, urgent, fish).
-order(c2, 1, b, not_urgent, fish).
-order(c1, 1, b, not_urgent, fish).
+% e.g. customer at ubc has ordered 2 units of fish from kb. This order is urgent.
+order(ubc, 2, kb, urgent, fish).
+order(ubc, 1, cr, not_urgent, fish).
+order(bp, 1, yvr, not_urgent, fish).
 
 
 % path(From,To,Visited,Cost,Path)
@@ -226,9 +190,6 @@ route(O,R,F,A,V,C) :-
              removefulfilled(O,V,X,NO), route(NO,R1,X,A,[X|V],C2),
              C is C1+C2, append(P,R1,R).
 
-% try: route([pdpair(a, b), pdpair(b, c3)], R, a, [b, a, c3, b],[a],C).
-
-
 % findRoute (Orders,Start,Route,Cost).
 % is true if Route a list of locations representing a route to fulfill all orders in Orders. Cost is the Cost of the route.
 % Start is the starting location.
@@ -252,8 +213,6 @@ isValidFood([order(_,_,R,_,F)|H]) :-
 % Start is the starting location.
 shortestRoute(O,S,R,C):-
              isValidFood(O),findRoute(O,S,R,C),\+notShortestRoute(O,S,R,C).
-
-% try: shortestRoute([order(b,2,a,urgent,fish),order(c3,2,b,urgent,fish)], a, R, C).
 
 
 % notShortestRoute(Orders,Start,Route,Cost)
@@ -327,9 +286,6 @@ plan(L2,C2,P20),
 C is C1+C2,
 append(P10,P20,P30).
 
-%try
-%plan([order(a,4,c1,urgent,F)],C,P1).
-
 % do(Order,Cost,Path)
 % a general Path of Order and its cost are produced.
 do([],_,[]).
@@ -338,11 +294,10 @@ check(L1,L2),
 plan(L2,C,P1).
 
 %try
-%do([order(a,4,c1,urgent,fish)],C,P1).
-%do([order(a,4,c1,urgent,fish),order(a,2,c2,urgent,fish)],C,P1).
-%do([order(c1,4,a,not_urgent,fish),order(c3,2,a,not_urgent,fish),order(c2,4,b,urgent,fish),order(c1,4,b,urgent,fish)],C,P1).
-%do([order(a,4,c5,urgent,fish)],C,P1).
-%do([order(a,4,b,urgent,fish),order(a,4,c,urgent,fish),order(a,4,b,urgent,fish),order(a,4,b,urgent,fish),order(a,4,b,urgent,fish),order(a,4,b,urgent,fish),order(a,4,b,urgent,fish)],C,P1).
+%do([order(ubc,4,yvr,urgent,fish)],C,P1).
+%do([order(ubc,4,yvr,urgent,fish),order(ubc,2,c2,rb,fish)],C,P1).
+%do([order(ubc,4,rb,not_urgent,fish),order(cr,2,ubc,not_urgent,fish),order(dt,4,ubc,urgent,fish),order(ubc,4,dt,urgent,fish)],C,P1).
+%do([order(rb,4,ubc,urgent,fish)],C,P1).
 
 
 % seperateByUrgent(L1,L2,L3).
@@ -352,10 +307,10 @@ seperateByUrgent([order(P1,X,P2,urgent,fish)|T1],[(P1,P2)|T2],L3):- seperateByUr
 seperateByUrgent([order(P1,X,P2,not_urgent,fish)|T1],L2,[(P1,P2)|T3]):- seperateByUrgent(T1,L2,T3).
 
 %try
-% seperateByUrgent([order(a,4,c1,not_urgent,fish),order(a,4,c1,urgent,fish),order(a,4,c2,urgent,fish)],L2,L3).
-% seperateByUrgent([order(a,4,c1,urgent,fish),order(a,4,c2,urgent,fish)],L2,L3).
+% seperateByUrgent([order(ubc,4,yvr,not_urgent,fish),order(a,4,c1,urgent,fish),order(a,4,c2,urgent,fish)],L2,L3).
+% seperateByUrgent([order(ubc,4,c1,yvr,fish),order(rb,4,ubc,urgent,fish)],L2,L3).
 
-% seperateByUrgent([order(c2, 4, b, urgent,fish), order(c1, 4, b, urgent,fish), order(c3, 2, a, not_urgent,fish), order(c1, 4, a, not_urgent,fish)] ,L2,L3).
+% seperateByUrgent([order(ubc, 4, rb, urgent,fish), order(cr, 4, ubc, urgent,fish), order(ubc, 2, rb, not_urgent,fish), order(rb, 4, ubc, not_urgent,fish)] ,L2,L3).
 
 % nearest(F1,L1,P2,L2,C).
 % find the P1's nearest place in L1,cost C produce as P2 and rest of L1 is L2.
@@ -507,7 +462,6 @@ go(Orders,Start) :-
 	 writef('sorry, the path does not exist').
 
 %try
-% go([order(b,2,a,urgent,fish),order(c3,2,b,urgent,fish)], a).
 % go([order(ubc,2,rb,urgent,fish),order(ubc,2,bp,urgent,fish)], rb).
 % go([order(ubc,2,rb,urgent,superFish),order(ubc,2,bp,urgent,fries)], rb).
 % go([order(cr,2,rb,urgent,hotPot),order(cr,2,bp,urgent,fries)], rb).
