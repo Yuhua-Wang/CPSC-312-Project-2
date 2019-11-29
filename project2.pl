@@ -76,7 +76,9 @@ hasFood(bb, fish).
 hasFood(sc, fish).
 hasFood(yvr, fish).
 hasFood(md, fish).
-hasFood(rd, fish).
+hasFood(rb, fish).
+hasFood(bp, fish).
+hasFood(cr, fish).
 
 
 % for mapI
@@ -221,17 +223,23 @@ route(O,R,F,A,V,C) :-
 % is true if Route a list of locations representing a route to fulfill all orders in Orders. Cost is the Cost of the route.
 % Start is the starting location.
 findRoute(O,S,R,C) :-
-             findAllLocations(O,L), findAllPdpairs(O,P),
+             findAllLocations(O,L), findAllPdpairs(O,P), 
              route(P,R,S,L,[S],C).
 
 % try: findRoute([order(b,2,a,urgent,fish),order(c3,2,b,urgent,fish)], a, R, C).
 
+% isValidFood(Orders) will check whether in all orders, each restaurant has the food ordered by the customer.
+isValidFood([]).
+isValidFood([order(_,_,R,_,F)|H]) :-
+	hasFood(R,F)->
+	isValidFood(H);
+	writef('sorry, restaurant at %w does not have food %w\n',[R,F]).
 
 % shortestRoute (Orders,Start,Route,Cost).
 % is true if Route a list of locations representing the shortest route to fulfill all orders in Orders. Cost is the Cost of the route.
 % Start is the starting location.
 shortestRoute(O,S,R,C):-
-             findRoute(O,S,R,C),\+notShortestRoute(O,S,R,C).
+             isValidFood(O),findRoute(O,S,R,C),\+notShortestRoute(O,S,R,C).
 
 % try: shortestRoute([order(b,2,a,urgent,fish),order(c3,2,b,urgent,fish)], a, R, C).
 
@@ -488,5 +496,7 @@ go(Orders,Start) :-
 
 %try
 % go([order(b,2,a,urgent,fish),order(c3,2,b,urgent,fish)], a).
+% go([order(ubc,2,rb,urgent,fish),order(ubc,2,bp,urgent,fish)], rb).
+
 
 
