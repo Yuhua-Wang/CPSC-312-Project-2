@@ -147,21 +147,25 @@ shortestPath(F,T,C,P) :- findpath(F,T,C,P), \+notShortestPath(F,T,C,P).
 % is true if there is other path from From to To with lower cost than Cost
 notShortestPath(F,T,C,P) :- findpath(F,T,C1,P1), dif(P,P1), C1<C.
 
-% currentShortestPath will store current shortest path and cost from start point to end point
-% To is the goal node, ReversedPath is a reversed path. C is cost
-% currentShortestPath([To|ReversedPath], C)
-
 % edge(From,To,Cost) is true if from From is connected to To directly with distance Cost
 edge(From,To,Cost) :- connected(To,From,Cost),
                         connected(From, To, Cost).
+
+% currentShortestPath will store current shortest path and cost from start point to end point
+% To is the goal node, ReversedPath is a reversed path. C is cost
+% currentShortestPath([To|ReversedPath], C)	
+% shorterPath2 use Dijkstra algorithm to search for shortest path and cost from start point to destination
+% if new Cost is small than old C, then use Cost to replace C.
 shorterPath2([H|Path], Cost) :-		      
 	currentShortestPath([H|T], C),!, Cost < C,        
 	retract(currentShortestPath([H|_],_)),
 	assert(currentShortestPath([H|Path], Cost)).
 
+% if path does not exist, create a new path.
 shorterPath2(Path, Cost) :-		    
 	assert(currentShortestPath(Path,Cost)).
  
+% goThroughAllNodes(From, Path, Cost) will go through every node and all unvisited neighbours and update the shortest path and cost 
 goThroughAllNodes(From, Path, Cost) :-		   
     edge(From, T, C),
 	\+memberchk(T, Path),	  
@@ -169,27 +173,18 @@ goThroughAllNodes(From, Path, Cost) :-
 	shorterPath2([T,From|Path], S),
 	goThroughAllNodes(T,[From|Path], S).	  
  
+% goThroughAllNodes(From) will remove current path and make a new path starting from the start point.
 goThroughAllNodes(From) :-
 	retractall(currentShortestPath(_,_)),        
 	goThroughAllNodes(From,[],0).     
 
 goThroughAllNodes(_).
- 
+
+% getShortestPath(From, To, Cost, Path) will return the shortest Path and minimum cost from From to To.
 getShortestPath(From, To, Cost, Path) :-
 	goThroughAllNodes(From),                  
 	currentShortestPath([To|ReversedPath], Cost),        
 	reverse([To|ReversedPath], Path).   	
-
-printOutShortestPath(From, To) :-                 
-	getShortestPath(From, To, Cost, Path)->            
-	writef('shortest path is %w with cost %w\n', [Path, Cost]);
-	writef('There is no path from %w to %w\n', [From, To]).
-
-%try
-% printOutShortestPath(a,b).   will print the shortest path between a and b with a cost if there is such a path.
-% if you need to get the shortest path and cost from A to B, please use getShortestPath(A, B, Path, Cost).
-
-
 
 % findpdpair(Order, PDPair).
 % is true if PDPair pdpair(P,D) represents a pair of pickup(P) and delivery(D) locations of an order pickup and delivery locations
@@ -247,6 +242,7 @@ isValidFood([order(_,_,R,_,F)|H]) :-
 	hasFood(R,F)->
 	isValidFood(H);
 	writef('sorry, restaurant at %w does not have food %w\n',[R,F]),
+	% hasFood(test,test) is for returning false 
 	hasFood(test,test).
 
 % shortestRoute (Orders,Start,Route,Cost).
@@ -511,6 +507,8 @@ go(Orders,Start) :-
 %try
 % go([order(b,2,a,urgent,fish),order(c3,2,b,urgent,fish)], a).
 % go([order(ubc,2,rb,urgent,fish),order(ubc,2,bp,urgent,fish)], rb).
+% go([order(ubc,2,rb,urgent,superFish),order(ubc,2,bp,urgent,fries)], rb).
+% go([order(cr,2,rb,urgent,hotPot),order(cr,2,bp,urgent,fries)], rb).
 
 
 
