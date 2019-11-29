@@ -1,4 +1,4 @@
-:- dynamic a/0,b/0,c1/0,c2/0,c3/0.
+:- dynamic a/0,b/0,c1/0,c2/0,c3/0,currentShortestPath/2.
 
 % connected(X,Y,C)
 % is true if the robot can move from location X to location Y with a cost of C
@@ -6,13 +6,13 @@
 % the following is defined for Map I on google doc
 % e.g. robots can go from a to c1 with a cost of 2:
 connected(a, c1, 2).
-connected(c1, a, 3).
+connected(c1, a, 2).
 connected(c1, b, 1).
-connected(b, c1, 2).
-connected(b, c3, 1).
+connected(b, c1, 1).
+connected(b, c3, 3).
 connected(c3, b, 3).
 connected(c1, c2, 4).
-connected(c2, c1, 2).
+connected(c2, c1, 4).
 
 /*
 % tests written for shortestPath
@@ -58,6 +58,42 @@ shortestPath(F,T,C,P) :- findpath(F,T,C,P), \+notShortest(F,T,C,P).
 % is true if there is other path from From to To with lower cost than Cost
 notShortest(F,T,C,P) :- findpath(F,T,C1,P1), dif(P,P1), C1<C.
 
+% currentShortestPath will store current shortest path and cost from start point to end point
+% To is the goal node, ReversedPath is a reversed path. C is cost
+% currentShortestPath([To|ReversedPath], C)
+
+% edge(From,To,Cost) is true if from From is connected to To directly with distance Cost
+edge(From,To,Cost) :- connected(To,From,Cost),
+                        connected(From, To, Cost).
+shorterPath2([H|Path], Cost) :-		      
+	currentShortestPath([H|T], C), Cost < C,        
+	retract(currentShortestPath([H|_],_)),
+	assert(currentShortestPath([H|Path], Cost)).
+
+shorterPath2(Path, Cost) :-		    
+	assert(currentShortestPath(Path,Cost)).
+ 
+goThroughAllNodes(From, Path, Cost) :-		   
+    edge(From, T, C),
+	\+memberchk(T, Path),	  
+	S is C+Cost,
+	shorterPath2([T,From|Path], S),
+	goThroughAllNodes(T,[From|Path], S).	  
+ 
+goThroughAllNodes(From) :-
+	retractall(currentShortestPath(_,_)),        
+	goThroughAllNodes(From,[],0).     
+
+goThroughAllNodes(_).
+ 
+go(From, To) :-
+	goThroughAllNodes(From),                  
+	currentShortestPath([To|RPath], Cost)->        
+	reverse([To|RPath], Path),     
+	writef('shortest path is %w with cost %w\n',
+	       [Path, Cost]);
+	writef('There is no path from %w to %w\n', [From, To]).
+ 
 
 % findpdpair(Order, PDPair).
 % is true if PDPair pdpair(P,D) represents a pair of pickup(P) and delivery(D) locations of an order pickup and delivery locations
@@ -146,4 +182,3 @@ seperateByUrgent([order(P1,X,P2,not_urgent)|T1],L2,[(P1,P2)|T3]):- seperateByUrg
 %try
 % seperateByUrgent([order(a,4,c1,not_urgent),order(a,4,c1,urgent),order(a,4,c2,urgent)],L2,L3).
 % seperateByUrgent([order(a,4,c1,urgent),order(a,4,c2,urgent)],L2,L3).
-
