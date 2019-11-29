@@ -1,4 +1,4 @@
-\% currentShortestPath([To|ReversedPath], C)	
+% currentShortestPath([To|ReversedPath], C)	
 % To is the goal node, ReversedPath is a reversed path. C is cost
 % currentShortestPath will store current shortest path and cost from start point to end point
 :- dynamic a/0,b/0,c1/0,c2/0,c3/0,currentShortestPath/2.
