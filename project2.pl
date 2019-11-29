@@ -78,6 +78,16 @@ hasFood(bp, fries).
 hasFood(cr, fish).
 hasFood(cr, surprise).
 
+%restaurant(P).
+% true if P is a restaurant.
+restaurant(a).
+restaurant(b).
+
+%customer(P).
+% true if P is a customer.
+customer(c1).
+customer(c2).
+customer(c3).
 
 % order(C,Q,R,U,F)
 % is true if a customer at location C has ordered Q units of food from restaurants at R, and the urgency level is U. F is food
